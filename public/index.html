@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>黄金价格提醒</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">XAU/USD 实时提醒</p>
+          <h1>黄金价格提醒</h1>
+        </div>
+        <button id="refreshButton" class="icon-button" type="button" title="立即刷新">
+          ↻
+        </button>
+      </section>
+
+      <section class="price-panel">
+        <div>
+          <p class="label">当前价格（美元/盎司）</p>
+          <p id="priceValue" class="price">--</p>
+          <p id="updatedAt" class="muted">等待首次更新</p>
+          <p id="errorMessage" class="error-message" aria-live="polite"></p>
+        </div>
+        <div id="statusBadge" class="status">正在获取</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">
+          <h2>提醒规则</h2>
+          <button id="enableNotifications" type="button">开启通知</button>
+        </div>
+
+        <form id="ruleForm" class="rule-form">
+          <label>
+            规则类型
+            <select id="ruleType" name="ruleType">
+              <option value="reference">参考价 + 提醒阈值</option>
+              <option value="window">N 分钟内涨跌超过阈值</option>
+            </select>
+          </label>
+
+          <label id="referenceField">
+            参考价（美元/盎司）
+            <input id="referencePrice" type="number" min="0" step="0.01" placeholder="例如 2400" />
+          </label>
+
+          <label id="windowField" class="hidden">
+            时间窗口（分钟）
+            <input id="windowMinutes" type="number" min="1" step="1" placeholder="例如 10" />
+          </label>
+
+          <label>
+            涨跌幅阈值（%）
+            <input id="thresholdPercent" type="number" min="0.01" step="0.01" placeholder="例如 0.5" required />
+          </label>
+
+          <button type="submit">添加规则</button>
+        </form>
+
+        <div id="rulesList" class="rules-list"></div>
+      </section>
+
+      <section class="panel compact">
+        <h2>最近记录</h2>
+        <div id="historyList" class="history-list"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
