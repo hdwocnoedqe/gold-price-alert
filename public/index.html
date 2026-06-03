@@ -23,6 +23,7 @@
           <p class="label">当前价格（美元/盎司）</p>
           <p id="priceValue" class="price">--</p>
           <p id="updatedAt" class="muted">等待首次更新</p>
+          <div id="alertBanner" class="alert-banner hidden" aria-live="assertive"></div>
           <p id="errorMessage" class="error-message" aria-live="polite"></p>
         </div>
         <div id="statusBadge" class="status">正在获取</div>
@@ -31,7 +32,10 @@
       <section class="panel">
         <div class="panel-title">
           <h2>提醒规则</h2>
-          <button id="enableNotifications" type="button">开启通知</button>
+          <div class="button-row">
+            <button id="testNotification" class="secondary" type="button">测试通知</button>
+            <button id="enableNotifications" type="button">开启通知</button>
+          </div>
         </div>
 
         <form id="ruleForm" class="rule-form">

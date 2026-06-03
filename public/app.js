@@ -11,10 +11,12 @@ const storageKeys = {
 const elements = {
   priceValue: document.querySelector("#priceValue"),
   updatedAt: document.querySelector("#updatedAt"),
+  alertBanner: document.querySelector("#alertBanner"),
   errorMessage: document.querySelector("#errorMessage"),
   statusBadge: document.querySelector("#statusBadge"),
   refreshButton: document.querySelector("#refreshButton"),
   enableNotifications: document.querySelector("#enableNotifications"),
+  testNotification: document.querySelector("#testNotification"),
   ruleForm: document.querySelector("#ruleForm"),
   ruleType: document.querySelector("#ruleType"),
   referenceField: document.querySelector("#referenceField"),
@@ -98,6 +100,11 @@ function setStatus(message, isError = false) {
 
 function setErrorMessage(message = "") {
   elements.errorMessage.textContent = message;
+}
+
+function showInPageAlert(message) {
+  elements.alertBanner.textContent = message;
+  elements.alertBanner.classList.remove("hidden");
 }
 
 function hasRenderableQuote(quote) {
@@ -230,10 +237,11 @@ function createAlertMessage(rule, evaluation) {
 
 function sendNotification(title, body) {
   if (!("Notification" in window) || Notification.permission !== "granted") {
-    return;
+    return false;
   }
 
   new Notification(title, { body });
+  return true;
 }
 
 function evaluateRulesAndNotify() {
@@ -248,7 +256,9 @@ function evaluateRulesAndNotify() {
     const nextRule = { ...normalizedRule };
 
     if (evaluation.status === "triggered" && !normalizedRule.armed) {
-      sendNotification("黄金价格提醒", createAlertMessage(normalizedRule, evaluation));
+      const message = createAlertMessage(normalizedRule, evaluation);
+      showInPageAlert(`黄金价格提醒：${message}`);
+      sendNotification("黄金价格提醒", message);
       nextRule.armed = true;
       changed = true;
     }
@@ -353,18 +363,44 @@ function addRule(event) {
 async function enableNotifications() {
   if (!("Notification" in window)) {
     elements.enableNotifications.textContent = "浏览器不支持通知";
+    showInPageAlert("这个浏览器不支持系统通知，页面内提醒仍然可用。");
     return;
   }
 
   const permission = await Notification.requestPermission();
   elements.enableNotifications.textContent =
     permission === "granted" ? "通知已开启" : "通知未开启";
+
+  if (permission === "granted") {
+    showInPageAlert("系统通知已开启。之后规则触发时，页面内提醒和系统通知都会尝试显示。");
+  } else {
+    showInPageAlert("系统通知没有开启。规则触发时，页面内提醒仍然会显示。");
+  }
+}
+
+function testNotification() {
+  const message = "这是一条测试提醒。如果系统通知没有弹出，页面内提醒也会保留。";
+  showInPageAlert(`黄金价格提醒：${message}`);
+
+  if (!("Notification" in window)) {
+    elements.enableNotifications.textContent = "浏览器不支持通知";
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    sendNotification("黄金价格提醒", message);
+    return;
+  }
+
+  elements.enableNotifications.textContent =
+    Notification.permission === "denied" ? "通知被浏览器拦截" : "请先开启通知";
 }
 
 elements.ruleType.addEventListener("change", updateRuleTypeFields);
 elements.ruleForm.addEventListener("submit", addRule);
 elements.refreshButton.addEventListener("click", fetchPrice);
 elements.enableNotifications.addEventListener("click", enableNotifications);
+elements.testNotification.addEventListener("click", testNotification);
 elements.rulesList.addEventListener("click", (event) => {
   const button = event.target.closest("[data-remove-rule]");
 
