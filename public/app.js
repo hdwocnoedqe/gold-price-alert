@@ -357,6 +357,7 @@ function addRule(event) {
   saveJson(storageKeys.rules, rules);
   elements.ruleForm.reset();
   updateRuleTypeFields();
+  evaluateRulesAndNotify();
   renderRules();
 }
 
